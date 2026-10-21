@@ -22,12 +22,19 @@ public class DatabaseInitializer
         );
 
         CREATE TABLE IF NOT EXISTS Mahasiswa (
-            Id        INTEGER PRIMARY KEY AUTOINCREMENT,
-            Nim       TEXT NOT NULL UNIQUE,
-            Nama      TEXT NOT NULL,
-            Email     TEXT NOT NULL DEFAULT '',
-            ProdiId   INTEGER NOT NULL REFERENCES ProgramStudi(Id) ON DELETE RESTRICT,
-            Angkatan  INTEGER NOT NULL
+            Id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            Nim           TEXT NOT NULL UNIQUE,
+            Nama          TEXT NOT NULL,
+            Email         TEXT NOT NULL DEFAULT '',
+            ProdiId       INTEGER NOT NULL REFERENCES ProgramStudi(Id) ON DELETE RESTRICT,
+            Angkatan      INTEGER NOT NULL,
+            JenisKelamin  TEXT NOT NULL DEFAULT 'L' CHECK (JenisKelamin IN ('L','P')),
+            TempatLahir   TEXT NOT NULL DEFAULT '',
+            TanggalLahir  TEXT NULL,
+            Alamat        TEXT NOT NULL DEFAULT '',
+            Telepon       TEXT NOT NULL DEFAULT '',
+            DosenWaliId   INTEGER NULL REFERENCES Dosen(Id) ON DELETE SET NULL,
+            Status        INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS TugasAkhir (
@@ -83,6 +90,9 @@ public class DatabaseInitializer
             CreatedAt  TEXT NOT NULL
         );
 
+        CREATE INDEX IF NOT EXISTS IX_Mahasiswa_Nama ON Mahasiswa(Nama COLLATE NOCASE);
+        CREATE INDEX IF NOT EXISTS IX_Mahasiswa_Angkatan ON Mahasiswa(Angkatan);
+        CREATE INDEX IF NOT EXISTS IX_Mahasiswa_Prodi ON Mahasiswa(ProdiId);
         CREATE INDEX IF NOT EXISTS IX_Bimbingan_TA ON Bimbingan(TugasAkhirId);
         CREATE INDEX IF NOT EXISTS IX_Bimbingan_Tanggal ON Bimbingan(Tanggal);
         CREATE INDEX IF NOT EXISTS IX_Sidang_Waktu ON JadwalSidang(Waktu);

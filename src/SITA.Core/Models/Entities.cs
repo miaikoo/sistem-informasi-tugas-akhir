@@ -37,12 +37,28 @@ public class Mahasiswa
     public string Email { get; set; } = "";
     public int ProdiId { get; set; }
     public int Angkatan { get; set; }
+    public string JenisKelamin { get; set; } = "L";
+    public string TempatLahir { get; set; } = "";
+    public DateTime? TanggalLahir { get; set; }
+    public string Alamat { get; set; } = "";
+    public string Telepon { get; set; } = "";
+    public int? DosenWaliId { get; set; }
+    public StatusMahasiswa Status { get; set; } = StatusMahasiswa.Aktif;
 
     public string ProdiNama { get; set; } = "";
     public TahapTA? TahapTA { get; set; }
 
     public string Display => $"{Nim} — {Nama}";
     public string TahapLabel => TahapTA is { } t ? EnumLabels.Of(t) : "Belum TA";
+    public string JenisKelaminLabel => JenisKelamin == "P" ? "Perempuan" : "Laki-laki";
+    public string StatusLabel => Status switch
+    {
+        StatusMahasiswa.Aktif => "Aktif",
+        StatusMahasiswa.Cuti => "Cuti",
+        StatusMahasiswa.Lulus => "Lulus",
+        StatusMahasiswa.DropOut => "Drop Out",
+        _ => "-"
+    };
 
     public Mahasiswa Clone() => (Mahasiswa)MemberwiseClone();
 }
