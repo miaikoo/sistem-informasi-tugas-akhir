@@ -1,0 +1,120 @@
+<UserControl x:Class="SITA.App.Views.MahasiswaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SITA.App.ViewModels"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance vm:MahasiswaViewModel}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===== Table ===== -->
+        <Border Style="{StaticResource Card}" Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <DockPanel Margin="20,16">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryButton}" Command="{Binding AddCommand}"
+                            Visibility="{Binding CanCreate, Converter={StaticResource BoolToVis}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Icon}" Text="&#xE710;" FontSize="12" Margin="0,0,8,0"/>
+                            <TextBlock Text="Tambah Mahasiswa"/>
+                        </StackPanel>
+                    </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Style="{StaticResource SearchBox}" Width="260" Tag="Cari NIM atau nama..."
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox Width="190" Margin="10,0,0,0" ItemsSource="{Binding ProdiFilterOptions}"
+                                  DisplayMemberPath="Label" SelectedItem="{Binding ProdiFilter}"/>
+                        <ComboBox Width="150" Margin="10,0,0,0" ItemsSource="{Binding AngkatanFilterOptions}"
+                                  DisplayMemberPath="Label" SelectedItem="{Binding AngkatanFilter}"/>
+                        <TextBlock Text="{Binding ItemCount, StringFormat='{}{0} data'}" Style="{StaticResource Muted}"
+                                   VerticalAlignment="Center" Margin="14,0,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+                    <DataGrid.InputBindings>
+                        <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}"/>
+                    </DataGrid.InputBindings>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="NIM" Binding="{Binding Nim}" Width="130" ElementStyle="{StaticResource CellText}"/>
+                        <DataGridTextColumn Header="NAMA" Binding="{Binding Nama}" Width="2*" ElementStyle="{StaticResource CellText}"/>
+                        <DataGridTextColumn Header="PROGRAM STUDI" Binding="{Binding ProdiNama}" Width="1.5*" ElementStyle="{StaticResource CellText}"/>
+                        <DataGridTextColumn Header="ANGKATAN" Binding="{Binding Angkatan}" Width="100" ElementStyle="{StaticResource CellText}"/>
+                        <DataGridTemplateColumn Header="STATUS TA" Width="140">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ContentControl Style="{StaticResource Badge}" Tag="{Binding TahapTA}" Content="{Binding TahapLabel}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="90">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Style="{StaticResource IconButton}" Content="&#xE70F;" ToolTip="Ubah" CommandParameter="{Binding}"
+                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                        <Button Style="{StaticResource IconButtonDanger}" Content="&#xE74D;" ToolTip="Hapus" CommandParameter="{Binding}"
+                                                Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE716;" FontSize="36" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <TextBlock Text="Tidak ada mahasiswa yang cocok dengan pencarian." Style="{StaticResource Muted}" Margin="0,12,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== Form ===== -->
+        <Border Grid.ColumnSpan="2" Style="{StaticResource FormPanel}" Visibility="{Binding IsFormOpen, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <DockPanel Margin="22,18,14,6">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE711;" Command="{Binding CancelFormCommand}"/>
+                    <TextBlock Text="{Binding FormTitle}" Style="{StaticResource SectionTitle}" FontSize="16" VerticalAlignment="Center"/>
+                </DockPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="22,0">
+                    <StackPanel Margin="0,0,0,12">
+                        <Border Style="{StaticResource FormError}" Visibility="{Binding FormError, Converter={StaticResource NullToVis}}">
+                            <TextBlock Text="{Binding FormError}" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" LineHeight="20"/>
+                        </Border>
+                        <TextBlock Text="NIM *" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Editor.Nim, UpdateSourceTrigger=PropertyChanged}" MaxLength="14"/>
+                        <TextBlock Text="Nama Lengkap *" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Editor.Nama, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                        <TextBlock Text="Email" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Editor.Email, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                        <TextBlock Text="Program Studi *" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox ItemsSource="{Binding ProdiList}" DisplayMemberPath="Nama" SelectedValuePath="Id"
+                                  SelectedValue="{Binding Editor.ProdiId}"/>
+                        <TextBlock Text="Angkatan *" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Editor.Angkatan, UpdateSourceTrigger=PropertyChanged}" MaxLength="4"/>
+                        <TextBlock Text="NIM 10–14 digit angka. Kolom bertanda * wajib diisi." Style="{StaticResource Muted}" Margin="0,14,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <Border Grid.Row="2" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="22,14">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource SecondaryButton}" Content="Batal" Margin="0,0,10,0" Command="{Binding CancelFormCommand}"/>
+                        <Button Style="{StaticResource PrimaryButton}" Content="Simpan" Command="{Binding SaveCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
